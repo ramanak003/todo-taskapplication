@@ -20,20 +20,29 @@ export function useTasks() {
         .order("created_at", { ascending: false })
 
       if (error) {
-        console.error("Supabase error:", error)
+        console.error("Supabase detailed error:", JSON.stringify(error, null, 2))
+
         // Check if table doesn't exist
         if (error.code === '42P01' || error.message?.includes('does not exist')) {
           throw new Error(
-            "Tasks table not found. Please run the SQL schema from supabase-schema.sql in your Supabase dashboard."
+            "Tasks table not found. Please run the SQL schema in Supabase."
           )
         }
+
+        // Check for stale schema cache (PGRST205)
+        if (error.code === 'PGRST205') {
+          throw new Error(
+            "Supabase Schema Cache is stale. Please run: NOTIFY pgrst, 'reload schema'; in your Supabase SQL Editor."
+          )
+        }
+
         // Check if RLS is blocking access
         if (error.code === '42501' || error.message?.includes('permission denied')) {
           throw new Error(
-            "Permission denied. Please check your Row Level Security (RLS) policies in Supabase."
+            "Permission denied. Check RLS policies."
           )
         }
-        throw new Error(error.message || "Failed to fetch tasks from database")
+        throw new Error(error.message || "Failed to fetch tasks")
       }
 
       // Transform Supabase data to Task format
@@ -52,12 +61,12 @@ export function useTasks() {
       setTasks(transformedTasks)
       setError(null)
     } catch (err) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
+      const errorMessage = err instanceof Error
+        ? err.message
         : typeof err === 'object' && err !== null && 'message' in err
-        ? String(err.message)
-        : "Failed to fetch tasks. Please ensure the tasks table exists in your Supabase database."
-      
+          ? String(err.message)
+          : "Failed to fetch tasks. Please ensure the tasks table exists in your Supabase database."
+
       setError(new Error(errorMessage))
       console.error("Error fetching tasks:", err)
     } finally {
@@ -69,18 +78,18 @@ export function useTasks() {
     async (
       params:
         | {
-            action: "created"
-            task: Task
-          }
+          action: "created"
+          task: Task
+        }
         | {
-            action: "updated" | "status_changed"
-            before: Task
-            after: Task
-          }
+          action: "updated" | "status_changed"
+          before: Task
+          after: Task
+        }
         | {
-            action: "deleted"
-            task: Task
-          }
+          action: "deleted"
+          task: Task
+        }
     ) => {
       try {
         const baseValues = (task: Task) => ({
@@ -175,10 +184,10 @@ export function useTasks() {
       const maxPosition =
         tasks.length > 0
           ? Math.max(
-              ...tasks.map((t) =>
-                typeof t.position === "number" ? t.position : 0
-              )
+            ...tasks.map((t) =>
+              typeof t.position === "number" ? t.position : 0
             )
+          )
           : -1
 
       const { data, error } = await supabase
@@ -196,9 +205,9 @@ export function useTasks() {
         console.error("Supabase insert error:", error)
         throw new Error(error.message || "Failed to add task")
       }
-      
+
       console.log("Task added successfully:", data)
-      
+
       // Optimistically update local state
       if (data) {
         const newTask: Task = {
@@ -218,7 +227,7 @@ export function useTasks() {
         // Log creation
         await logTaskChange({ action: "created", task: newTask })
       }
-      
+
       return data
     } catch (err) {
       console.error("Error adding task:", err)
@@ -232,10 +241,10 @@ export function useTasks() {
       const before = tasks.find((t) => t.id === id) ?? null
 
       // Optimistically update local state
-      setTasks(prev => prev.map(task => 
+      setTasks(prev => prev.map(task =>
         task.id === id ? { ...task, ...updates } : task
       ))
-      
+
       const { data, error } = await supabase
         .from("tasks")
         .update(updates)
@@ -249,7 +258,7 @@ export function useTasks() {
         await fetchTasks()
         throw new Error(error.message || "Failed to update task")
       }
-      
+
       console.log("Task updated successfully:", data)
       if (before) {
         const after: Task = {
@@ -281,7 +290,7 @@ export function useTasks() {
 
       // Optimistically update local state
       setTasks(prev => prev.filter(task => task.id !== id))
-      
+
       const { error, data } = await supabase
         .from("tasks")
         .delete()
@@ -294,7 +303,7 @@ export function useTasks() {
         await fetchTasks()
         throw new Error(error.message || "Failed to delete task")
       }
-      
+
       console.log("Task deleted successfully:", data)
       if (toDelete) {
         await logTaskChange({ action: "deleted", task: toDelete })
@@ -310,10 +319,10 @@ export function useTasks() {
       console.log("Attempting to delete all tasks")
       const snapshot = [...tasks]
       const taskCount = snapshot.length
-      
+
       // Optimistically clear local state
       setTasks([])
-      
+
       const { error } = await supabase
         .from("tasks")
         .delete()
@@ -325,7 +334,7 @@ export function useTasks() {
         await fetchTasks()
         throw new Error(error.message || "Failed to delete all tasks")
       }
-      
+
       console.log("All tasks deleted successfully")
       // Log deletions (best-effort)
       await Promise.all(
