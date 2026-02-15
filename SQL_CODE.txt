@@ -1,0 +1,41 @@
+-- COPY ALL TEXT BELOW THIS LINE --
+
+CREATE TABLE IF NOT EXISTS projects (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  color TEXT DEFAULT '#6366f1',
+  icon TEXT DEFAULT 'folder',
+  project_link TEXT,
+  due_date DATE,
+  team_assigned TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tasks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  status TEXT NOT NULL CHECK (status IN ('backlog', 'todo', 'in progress', 'done', 'canceled')),
+  priority TEXT NOT NULL CHECK (priority IN ('low', 'medium', 'high')),
+  date DATE,
+  deadline DATE,
+  reminder TIMESTAMP WITH TIME ZONE,
+  position INTEGER,
+  project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+
+-- Allow public access for now (Development Mode)
+DROP POLICY IF EXISTS "Allow public access" ON tasks;
+DROP POLICY IF EXISTS "Allow public access to projects" ON projects;
+
+CREATE POLICY "Allow public access" ON tasks FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow public access to projects" ON projects FOR ALL USING (true) WITH CHECK (true);
+
+-- COPY ALL TEXT ABOVE THIS LINE --
