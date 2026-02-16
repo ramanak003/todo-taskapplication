@@ -32,6 +32,19 @@ yarn-error.log*
 # env files (keep .env.local private!)
 .env*.local
 .env
+.env.vercel.test
+
+# sensitive credentials
+supabase_url.txt
+supabase_key.txt
+resend_key.txt
+
+# local logs and temp files
+*.txt
+*.json
+!package.json
+!tsconfig.json
+!components.json
 
 # vercel
 .vercel
