@@ -34,15 +34,17 @@ if %ERRORLEVEL% NEQ 0 (
     echo.
     echo [ERROR] Push failed! 
     echo.
-    echo ----------------------------------------
-    echo POSSIBLY CAUSE: Permission Denied (403)
-    echo ----------------------------------------
-    echo If you see "403" above, please follow these steps:
+    echo --------------------------------------------------
+    echo POSSIBLE CAUSE: Credential Conflict or Permissions
+    echo --------------------------------------------------
+    echo if you see "403" or "Permission Denied", please try these CLI commands:
+    echo 1. Run: git config --local credential.helper ""
+    echo 2. Run this script again.
+    echo.
+    echo [MANUAL FIX]:
     echo 1. Open START MENU and type "Credential Manager"
     echo 2. Click "Windows Credentials"
-    echo 3. Scroll down to "Generic Credentials"
-    echo 4. Find and REMOVE the entry for "git:https://github.com"
-    echo 5. Run this script again - it will ask for a fresh login.
+    echo 3. Remove any entry for "git:https://github.com"
     echo.
     pause
     exit /b %ERRORLEVEL%
