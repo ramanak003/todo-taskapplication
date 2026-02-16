@@ -1,12 +1,12 @@
 # QuickTask Application
 
-[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://ramana-tasks.vercel.app)
+[![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://ramana-taska.vercel.app)
 
 A modern, feature-rich task management application built with Next.js, Supabase, and Shadcn UI.
 
 ---
 
-### 🌐 [Click here to View the App (Live on Vercel)](https://ramana-tasks.vercel.app)
+### 🌐 [Click here to View the App (Live on Vercel)](https://ramana-taska.vercel.app)
 
 ---
 
