@@ -42,7 +42,7 @@ A modern, feature-rich task management application built with Next.js, Supabase,
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ramanak003/todo-taskapplication.git
+   git clone https://github.com/ramana003/todo-taskapplication.git
    cd todo-taskapplication
    ```
 
