@@ -1,4 +1,4 @@
-# QuickTask Application
+# Ramana Tasks Application
 
 [![Live Demo](https://img.shields.io/badge/demo-online-green.svg)](https://ramana-tasks.vercel.app)
 
@@ -42,8 +42,8 @@ A modern, feature-rich task management application built with Next.js, Supabase,
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Gokulakrishnxn/QuickTask-Application.git
-   cd QuickTask-Application
+   git clone https://github.com/ramanak003/todo-taskapplication.git
+   cd todo-taskapplication
    ```
 
 2. **Install dependencies:**
@@ -206,7 +206,8 @@ MIT License - feel free to use this project for learning or production!
 
 ## 👨‍💻 Author
 
-Built with ❤️ by Gokulakrishnan
+Built with ❤️ by Ramana K
+
 
 ## 🙏 Acknowledgments
 

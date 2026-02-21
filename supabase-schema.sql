@@ -47,7 +47,7 @@ CREATE POLICY "Allow public access to projects" ON projects FOR ALL USING (true)
 INSERT INTO projects (name, description, color, icon) VALUES ('Personal', 'Example project', '#3b82f6', 'user');
 
 INSERT INTO tasks (title, status, priority, position, project_id) 
-SELECT 'Welcome to QuickTask!', 'todo', 'high', 1, id FROM projects LIMIT 1;
+SELECT 'Welcome to Ramana Tasks!', 'todo', 'high', 1, id FROM projects LIMIT 1;
 
 -- 6. RELOAD SCHEMA CACHE (CRITICAL FIX)
 NOTIFY pgrst, 'reload schema';

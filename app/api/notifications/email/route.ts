@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       subject,
       html,
       text,
-      from = "QuickTask <notifications@quicktask.your-domain.com>",
+      from = "Ramana Tasks <notifications@ramana-tasks.vercel.app>",
     } = body as {
       to?: string | string[]
       subject?: string

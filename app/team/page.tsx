@@ -202,180 +202,180 @@ const createTeamMemberColumns = (
   handleDeleteMember: (member: TeamMember) => void,
   currentUser: { id: string; email: string; role: "Admin" | "Member" | "Viewer" }
 ): ColumnDef<TeamMember>[] => [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="h-8"
+          >
+            Name
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const member = row.original
+        const getInitials = (name: string) => {
+          return name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2)
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="h-8"
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const member = row.original
-      const getInitials = (name: string) => {
-        return name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2)
-      }
 
-      return (
-        <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8">
-            {member.avatar && (
-              <AvatarImage src={member.avatar} alt={member.name} />
-            )}
-            <AvatarFallback className="text-xs">
-              {getInitials(member.name)}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium">{member.name}</div>
-            <div className="text-sm text-muted-foreground">{member.email}</div>
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+              {member.avatar && (
+                <AvatarImage src={member.avatar} alt={member.name} />
+              )}
+              <AvatarFallback className="text-xs">
+                {getInitials(member.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-medium">{member.name}</div>
+              <div className="text-sm text-muted-foreground">{member.email}</div>
+            </div>
           </div>
-        </div>
-      )
+        )
+      },
     },
-  },
-  {
-    accessorKey: "role",
-    header: "Role",
-    cell: ({ row }) => {
-      const role = row.getValue("role") as string
-      return (
-        <Badge variant="outline" className="capitalize">
-          {role}
-        </Badge>
-      )
+    {
+      accessorKey: "role",
+      header: "Role",
+      cell: ({ row }) => {
+        const role = row.getValue("role") as string
+        return (
+          <Badge variant="outline" className="capitalize">
+            {role}
+          </Badge>
+        )
+      },
     },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string
-      return (
-        <Badge
-          variant={status === "active" ? "default" : status === "pending" ? "secondary" : "outline"}
-          className="capitalize"
-        >
-          {status}
-        </Badge>
-      )
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string
+        return (
+          <Badge
+            variant={status === "active" ? "default" : status === "pending" ? "secondary" : "outline"}
+            className="capitalize"
+          >
+            {status}
+          </Badge>
+        )
+      },
     },
-  },
-  {
-    accessorKey: "joinedAt",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="h-8"
-        >
-          Joined
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
+    {
+      accessorKey: "joinedAt",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="h-8"
+          >
+            Joined
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const date = row.getValue("joinedAt") as Date
+        return <div className="text-sm">{format(date, "MMM d, yyyy")}</div>
+      },
     },
-    cell: ({ row }) => {
-      const date = row.getValue("joinedAt") as Date
-      return <div className="text-sm">{format(date, "MMM d, yyyy")}</div>
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const member = row.original
-      const isAdmin = currentUser.role === "Admin"
-      const isCurrentUser = member.id === currentUser.id
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const member = row.original
+        const isAdmin = currentUser.role === "Admin"
+        const isCurrentUser = member.id === currentUser.id
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <IconDotsVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => {
-                navigator.clipboard.writeText(member.email)
-                toast.success("Email copied to clipboard")
-              }}
-            >
-              <IconMail className="mr-2 h-4 w-4" />
-              Copy email
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleEditMember(member)}>
-              <IconEdit className="mr-2 h-4 w-4" />
-              Edit member
-            </DropdownMenuItem>
-            {/* Only show remove option for admins, and prevent removing yourself */}
-            {isAdmin && !isCurrentUser && (
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <IconDotsVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => handleDeleteMember(member)}
+                onClick={() => {
+                  navigator.clipboard.writeText(member.email)
+                  toast.success("Email copied to clipboard")
+                }}
               >
-                <IconTrash className="mr-2 h-4 w-4" />
-                Remove member
+                <IconMail className="mr-2 h-4 w-4" />
+                Copy email
               </DropdownMenuItem>
-            )}
-            {isAdmin && isCurrentUser && (
-              <DropdownMenuItem disabled className="text-muted-foreground">
-                <IconTrash className="mr-2 h-4 w-4" />
-                Cannot remove yourself
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleEditMember(member)}>
+                <IconEdit className="mr-2 h-4 w-4" />
+                Edit member
               </DropdownMenuItem>
-            )}
-            {!isAdmin && (
-              <DropdownMenuItem disabled className="text-muted-foreground">
-                <IconTrash className="mr-2 h-4 w-4" />
-                Only admins can remove members
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+              {/* Only show remove option for admins, and prevent removing yourself */}
+              {isAdmin && !isCurrentUser && (
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => handleDeleteMember(member)}
+                >
+                  <IconTrash className="mr-2 h-4 w-4" />
+                  Remove member
+                </DropdownMenuItem>
+              )}
+              {isAdmin && isCurrentUser && (
+                <DropdownMenuItem disabled className="text-muted-foreground">
+                  <IconTrash className="mr-2 h-4 w-4" />
+                  Cannot remove yourself
+                </DropdownMenuItem>
+              )}
+              {!isAdmin && (
+                <DropdownMenuItem disabled className="text-muted-foreground">
+                  <IconTrash className="mr-2 h-4 w-4" />
+                  Only admins can remove members
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
     },
-  },
-]
+  ]
 
 export default function Page() {
-  const [inviteLink, setInviteLink] = React.useState("https://quicktask.app/join/abc123xyz")
+  const [inviteLink, setInviteLink] = React.useState("https://ramana-tasks.vercel.app/join/abc123xyz")
   const [emailInvite, setEmailInvite] = React.useState("")
   const [copiedLink, setCopiedLink] = React.useState(false)
   const [isInviteDialogOpen, setIsInviteDialogOpen] = React.useState(false)
@@ -383,14 +383,14 @@ export default function Page() {
   const [editingMember, setEditingMember] = React.useState<TeamMember | null>(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [memberToDelete, setMemberToDelete] = React.useState<TeamMember | null>(null)
-  
+
   // Current user - in a real app, this would come from authentication context
   const currentUser = {
     id: "1", // John Doe is the admin
     email: "john@example.com",
     role: "Admin" as const,
   }
-  
+
   // Check if current user is admin
   const isAdmin = currentUser.role === "Admin"
 
@@ -628,9 +628,9 @@ export default function Page() {
                                           {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                              )}
+                                              header.column.columnDef.header,
+                                              header.getContext()
+                                            )}
                                         </TableHead>
                                       )
                                     })}

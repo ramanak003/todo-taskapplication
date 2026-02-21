@@ -2,7 +2,7 @@
 setlocal
 
 echo ========================================
-echo   QuickTask: Uploading to GitHub...
+echo   Todo App: Uploading to GitHub...
 echo ========================================
 
 :: Step 1: Add changes

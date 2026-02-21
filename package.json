@@ -1,6 +1,7 @@
 {
-  "name": "taskapp",
+  "name": "todo-taskapplication",
   "version": "0.1.0",
+  "author": "Ramana K",
   "private": true,
   "scripts": {
     "dev": "next dev",
