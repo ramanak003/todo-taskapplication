@@ -45,11 +45,17 @@ class MockSupabaseClient {
     window.dispatchEvent(new Event('storage'));
   }
 
+  auth = {
+    getUser: async () => ({ data: { user: null }, error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
+    signOut: async () => ({ error: null })
+  };
+
   from(table: string) {
     return {
       select: (columns: string = '*', { count, head }: { count?: string, head?: boolean } = {}) => {
         const data = this.getData(table);
-        return {
+        const chainable = {
           order: (column: string, { ascending = true } = {}) => {
             const sortedData = [...data].sort((a, b) => {
               const valA = a[column];
@@ -58,23 +64,18 @@ class MockSupabaseClient {
               if (valA > valB) return ascending ? 1 : -1;
               return 0;
             });
-            return {
-              then: (fn: any) => Promise.resolve(fn({ data: sortedData, error: null })),
-              single: () => Promise.resolve({ data: sortedData[0] || null, error: null }),
-            };
+            // Update data for next chain
+            data.splice(0, data.length, ...sortedData)
+            return chainable;
           },
           eq: (column: string, value: any) => {
             const filteredData = data.filter(item => item[column] === value);
-            return {
-              select: () => ({ single: () => Promise.resolve({ data: filteredData[0] || null, error: null }) }),
-              single: () => Promise.resolve({ data: filteredData[0] || null, error: null }),
-              then: (fn: any) => Promise.resolve(fn({ data: filteredData, error: null })),
-            };
+            data.splice(0, data.length, ...filteredData);
+            return chainable;
           },
           limit: (n: number) => {
-            return {
-              then: (fn: any) => Promise.resolve(fn({ data: data.slice(0, n), error: null })),
-            };
+            data.splice(n);
+            return chainable;
           },
           then: (fn: any) => {
             if (head) return Promise.resolve(fn({ count: data.length, data: null, error: null }));
@@ -82,6 +83,7 @@ class MockSupabaseClient {
           },
           single: () => Promise.resolve({ data: data[0] || null, error: null }),
         };
+        return chainable;
       },
       insert: (values: any[]) => {
         const data = this.getData(table);
@@ -152,16 +154,10 @@ class MockSupabaseClient {
 const realSupabase = createClient(supabaseUrl, supabaseAnonKey)
 const mockSupabase = new MockSupabaseClient()
 
-// Export a proxy that can switch or try-catch
-export const supabase: any = new Proxy(realSupabase, {
-  get(target, prop) {
-    // If we are in local-only mode (detected by a flag or previous failure)
-    if (typeof window !== 'undefined' && window.localStorage.getItem('supabase_fallback_active') === 'true') {
-      return (mockSupabase as any)[prop];
-    }
-    return (target as any)[prop];
-  }
-});
+const isLocalMode = typeof window !== 'undefined' && window.localStorage.getItem('supabase_fallback_active') === 'true';
+
+// Export the correct client statically to avoid Proxy context loss
+export const supabase: any = isLocalMode ? mockSupabase : realSupabase;
 
 // Helper to switch to fallback
 export const useLocalFallback = () => {
