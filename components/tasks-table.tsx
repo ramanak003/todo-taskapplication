@@ -382,9 +382,11 @@ export function TasksTable({
     []
   )
 
+  const columns = React.useMemo(() => createColumns(onDeleteTask), [onDeleteTask])
+
   const table = useReactTable({
     data,
-    columns: createColumns(onDeleteTask),
+    columns,
     state: {
       sorting,
       columnVisibility,
@@ -405,13 +407,18 @@ export function TasksTable({
   })
 
   // Update itemOrder when table rows change (respects sorting/filtering/pagination)
+  const rows = table.getRowModel().rows
   React.useEffect(() => {
-    const rows = table.getRowModel().rows
     const rowIds = rows.map((row) => row.original.id)
     if (rowIds.length > 0) {
-      setItemOrder(rowIds)
+      setItemOrder((prev) => {
+        if (prev.length === rowIds.length && prev.every((id, i) => id === rowIds[i])) {
+          return prev
+        }
+        return rowIds
+      })
     }
-  }, [table, data])
+  }, [rows])
 
   const handleDragEnd = React.useCallback(
     async (event: DragEndEvent) => {
