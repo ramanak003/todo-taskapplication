@@ -10,13 +10,13 @@ import {
 import { useProjects } from "@/hooks/use-projects"
 import { useTasks } from "@/hooks/use-tasks"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CreateProjectDialog } from "@/components/create-project-dialog"
 import { EditProjectDialog } from "@/components/edit-project-dialog"
 import { CreateTaskSheet } from "@/components/create-task-sheet"
-import { TasksTable } from "@/components/tasks-table"
+import { TasksTable, type Task } from "@/components/tasks-table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { type TeamMember } from "@/components/team-mention-input"
 import { ProjectOverviewCard } from "@/components/project-overview-card"
@@ -28,6 +28,7 @@ import {
   IconEdit,
   IconTrash,
   IconListDetails,
+  IconCircleDot,
 } from "@tabler/icons-react"
 import {
   DropdownMenu,
@@ -40,7 +41,7 @@ import { toast } from "sonner"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Page() {
-  const { projects, loading: projectsLoading, error: projectsError, addProject, updateProject, deleteProject } = useProjects()
+  const { projects, loading: projectsLoading, error: projectsError, addProject, updateProject, deleteProject, isLocalMode } = useProjects()
   const { tasks, loading: tasksLoading, error: tasksError, addTask, updateTask, deleteTask } = useTasks()
   const [selectedProjectId, setSelectedProjectId] = React.useState<string | null>(null)
   const [isCreateProjectOpen, setIsCreateProjectOpen] = React.useState(false)
@@ -86,7 +87,7 @@ export default function Page() {
     if (!confirm("Are you sure you want to delete this project? Tasks in this project will not be deleted.")) {
       return
     }
-    
+
     try {
       await deleteProject(projectId)
       toast.success("Project deleted successfully")
@@ -99,7 +100,7 @@ export default function Page() {
     }
   }
 
-  const handleAddTaskToProject = async (task: any) => {
+  const handleAddTaskToProject = async (task: Omit<Task, "id">) => {
     if (selectedProjectId) {
       await addTask({ ...task, project_id: selectedProjectId })
     } else {
@@ -148,10 +149,48 @@ export default function Page() {
 
                 {error && (
                   <Alert variant="destructive" className="mb-4">
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>
-                      {error.message || "Failed to load data. Please check your connection."}
-                    </AlertDescription>
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                          {error.message || "Failed to load data. Please check your connection."}
+                        </AlertDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0 ml-4 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground bg-white dark:bg-black"
+                        onClick={() => {
+                          import("@/lib/supabase").then(m => m.useLocalFallback())
+                        }}
+                      >
+                        Try Local Mode
+                      </Button>
+                    </div>
+                  </Alert>
+                )}
+
+                {isLocalMode && (
+                  <Alert className="mb-6 bg-blue-500/10 border-blue-500/50 text-blue-700 dark:text-blue-400">
+                    <IconCircleDot className="h-4 w-4" />
+                    <div className="flex items-center justify-between w-full ml-2">
+                      <div>
+                        <AlertTitle>Local Mode Active</AlertTitle>
+                        <AlertDescription>
+                          Using local browser storage. Changes will NOT be synced to Supabase until you return to Online Mode.
+                        </AlertDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-blue-500 text-blue-700 dark:text-blue-400 hover:bg-blue-500 hover:text-white"
+                        onClick={() => {
+                          import("@/lib/supabase").then(m => m.useRealSupabase())
+                        }}
+                      >
+                        Return to Online Mode
+                      </Button>
+                    </div>
                   </Alert>
                 )}
 
@@ -193,13 +232,12 @@ export default function Page() {
                         {projects.map((project) => {
                           const taskCount = tasks.filter(t => t.project_id === project.id).length
                           const isSelected = selectedProjectId === project.id
-                          
+
                           return (
                             <div
                               key={project.id}
-                              className={`flex items-center gap-4 p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
-                                isSelected ? "bg-muted border-l-4 border-l-primary" : ""
-                              }`}
+                              className={`flex items-center gap-4 p-4 cursor-pointer transition-colors hover:bg-muted/50 ${isSelected ? "bg-muted border-l-4 border-l-primary" : ""
+                                }`}
                               onClick={() => {
                                 setSelectedProjectId(project.id)
                                 setOverviewProjectId(project.id)

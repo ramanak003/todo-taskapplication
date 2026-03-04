@@ -10,8 +10,6 @@ import {
   IconFolder,
   IconLayoutGrid,
   IconListDetails,
-  IconSettings,
-  IconUser,
   IconUsers,
 } from "@tabler/icons-react"
 
@@ -121,21 +119,18 @@ const data = {
   navSecondary: [],
 }
 
-import { type Task } from "@/components/tasks-table"
+
 
 export function AppSidebar({
-  onTaskCreate,
   ...props
-}: React.ComponentProps<typeof Sidebar> & {
-  onTaskCreate?: (task: Omit<Task, "id">) => Promise<void>
-}) {
+}: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         {/* Header content removed */}
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} onTaskCreate={onTaskCreate} />
+        <NavMain items={data.navMain} />
         {data.navSecondary.length > 0 && (
           <NavSecondary items={data.navSecondary} className="mt-auto" />
         )}

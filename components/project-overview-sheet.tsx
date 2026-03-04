@@ -11,8 +11,6 @@ import {
   IconEdit,
   IconTrash,
   IconListDetails,
-  IconClock,
-  IconCircleCheck,
 } from "@tabler/icons-react"
 import {
   Sheet,
@@ -20,14 +18,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { type Project } from "@/hooks/use-projects"
 import { type TeamMember } from "@/components/team-mention-input"
-import { cn } from "@/lib/utils"
 import { EditProjectDialog } from "@/components/edit-project-dialog"
 import { TeamMemberDetailSheet } from "@/components/team-member-detail-sheet"
 import {
@@ -96,12 +92,12 @@ export function ProjectOverviewSheet({
   // Get linked projects (projects that share team members with this project)
   const getLinkedProjects = (): Project[] => {
     if (!project || teamMembers.length === 0) return []
-    
+
     return allProjects.filter((p) => {
       if (p.id === project.id) return false // Exclude current project
       const pMembers = parseTeamMembers(p.team_assigned)
       // Check if any team member is shared
-      return pMembers.some((pm) => 
+      return pMembers.some((pm) =>
         teamMembers.some((tm) => tm.id === pm.id || tm.email === pm.email)
       )
     })

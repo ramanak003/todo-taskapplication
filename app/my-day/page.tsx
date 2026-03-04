@@ -11,7 +11,7 @@ import { useTasks } from "@/hooks/use-tasks"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { IconSun, IconCalendar } from "@tabler/icons-react"
+import { IconSun } from "@tabler/icons-react"
 import { format, isToday, parseISO } from "date-fns"
 
 export default function Page() {
@@ -85,7 +85,7 @@ export default function Page() {
                     <h1 className="text-3xl font-bold tracking-tight">My Day</h1>
                   </div>
                   <p className="text-muted-foreground">
-                    Focus on today's tasks and priorities
+                    Focus on today&apos;s tasks and priorities
                   </p>
                 </div>
 
@@ -93,7 +93,7 @@ export default function Page() {
                 <div className="grid gap-4 md:grid-cols-3 mb-6">
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium">Today's Tasks</CardTitle>
+                      <CardTitle className="text-sm font-medium">Today&apos;s Tasks</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">{todayTasks.length}</div>
@@ -185,8 +185,8 @@ export default function Page() {
                         </CardContent>
                       </Card>
                     )}
-                    <TasksTable 
-                      data={myDayTasks} 
+                    <TasksTable
+                      data={myDayTasks}
                       onUpdateTask={updateTask}
                       onDeleteTask={deleteTask}
                       hideFilters={true}

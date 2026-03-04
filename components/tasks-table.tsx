@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsLeft,
@@ -121,148 +120,148 @@ export type Task = {
   deadline?: string
   reminder?: string
   project_id?: string
-   // Optional position field used for drag-and-drop ordering
+  // Optional position field used for drag-and-drop ordering
   position?: number | null
 }
 
 export const createColumns = (
   onDeleteTask?: (id: string) => Promise<void>
 ): ColumnDef<Task>[] => [
-  {
-    id: "drag-handle",
-    header: "",
-    cell: () => (
-      <div className="flex items-center justify-center w-full h-full py-2 px-1">
-        <IconGripVertical className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    size: 40,
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "title",
-    header: "Title",
-    cell: ({ row }) => {
-      const label = row.original.title
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">{label}</span>
+    {
+      id: "drag-handle",
+      header: "",
+      cell: () => (
+        <div className="flex items-center justify-center w-full h-full py-2 px-1">
+          <IconGripVertical className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
         </div>
-      )
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      size: 40,
     },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = statuses.find((status) => status.value === row.getValue("status"))
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="translate-y-[2px]"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "title",
+      header: "Title",
+      cell: ({ row }) => {
+        const label = row.original.title
+        return (
+          <div className="flex space-x-2">
+            <span className="max-w-[500px] truncate font-medium">{label}</span>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = statuses.find((status) => status.value === row.getValue("status"))
 
-      if (!status) {
-        return null
-      }
+        if (!status) {
+          return null
+        }
 
-      return (
-        <Badge variant="outline" className="capitalize">
-          {status.label}
-        </Badge>
-      )
+        return (
+          <Badge variant="outline" className="capitalize">
+            {status.label}
+          </Badge>
+        )
+      },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
+      },
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    accessorKey: "priority",
-    header: "Priority",
-    cell: ({ row }) => {
-      const priority = priorities.find(
-        (priority) => priority.value === row.getValue("priority")
-      )
+    {
+      accessorKey: "priority",
+      header: "Priority",
+      cell: ({ row }) => {
+        const priority = priorities.find(
+          (priority) => priority.value === row.getValue("priority")
+        )
 
-      if (!priority) {
-        return null
-      }
+        if (!priority) {
+          return null
+        }
 
-      return (
-        <Badge variant="outline" className="capitalize">
-          {priority.label}
-        </Badge>
-      )
+        return (
+          <Badge variant="outline" className="capitalize">
+            {priority.label}
+          </Badge>
+        )
+      },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
+      },
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            variant="destructive"
-            onClick={async (e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              
-              if (!confirm("Are you sure you want to delete this task?")) {
-                return
-              }
-              
-              if (onDeleteTask) {
-                try {
-                  await onDeleteTask(row.original.id)
-                  toast.success("Task deleted successfully")
-                } catch (error) {
-                  console.error("Failed to delete task:", error)
-                  toast.error("Failed to delete task", {
-                    description: error instanceof Error ? error.message : "Please try again.",
-                  })
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
+              <IconDotsVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Make a copy</DropdownMenuItem>
+            <DropdownMenuItem>Favorite</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+
+                if (!confirm("Are you sure you want to delete this task?")) {
+                  return
                 }
-              }
-            }}
-          >
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
+
+                if (onDeleteTask) {
+                  try {
+                    await onDeleteTask(row.original.id)
+                    toast.success("Task deleted successfully")
+                  } catch (error) {
+                    console.error("Failed to delete task:", error)
+                    toast.error("Failed to delete task", {
+                      description: error instanceof Error ? error.message : "Please try again.",
+                    })
+                  }
+                }
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ]
 
 const columns: ColumnDef<Task>[] = createColumns()
 
@@ -284,9 +283,8 @@ function SortableTableRow({
   }
 
   // Find the drag handle cell to attach listeners
-  const dragHandleCell = row.getVisibleCells().find(
-    (cell) => cell.column.id === "drag-handle"
-  )
+  // row.getVisibleCells().find((cell) => cell.column.id === "drag-handle")
+  // )
 
   return (
     <TableRow
@@ -328,7 +326,7 @@ function SortableTableRow({
   )
 }
 
-export function TasksTable({ 
+export function TasksTable({
   data,
   onAddTask,
   onUpdateTask,
@@ -336,7 +334,7 @@ export function TasksTable({
   onDeleteAll,
   hideFilters = false,
   hideAddTaskButton = false,
-}: { 
+}: {
   data: Task[]
   onAddTask?: (task: Omit<Task, "id">) => Promise<void>
   onUpdateTask?: (id: string, updates: Partial<Task>) => Promise<void>
@@ -408,11 +406,12 @@ export function TasksTable({
 
   // Update itemOrder when table rows change (respects sorting/filtering/pagination)
   React.useEffect(() => {
-    const rowIds = table.getRowModel().rows.map((row) => row.original.id)
+    const rows = table.getRowModel().rows
+    const rowIds = rows.map((row) => row.original.id)
     if (rowIds.length > 0) {
       setItemOrder(rowIds)
     }
-  }, [table.getRowModel().rows, data])
+  }, [table, data])
 
   const handleDragEnd = React.useCallback(
     async (event: DragEndEvent) => {
@@ -422,7 +421,7 @@ export function TasksTable({
       const currentRowIds = table.getRowModel().rows.map((row) => row.original.id)
       const oldIndex = currentRowIds.indexOf(active.id as string)
       const newIndex = currentRowIds.indexOf(over.id as string)
-      
+
       if (oldIndex === -1 || newIndex === -1) return
 
       const newOrder = arrayMove(currentRowIds, oldIndex, newIndex)
@@ -433,12 +432,12 @@ export function TasksTable({
         try {
           // Build a lookup of tasks by id from current data
           const taskMap = new Map(data.map((task) => [task.id, task]))
-          
+
           // Get all existing positions to find the base
           const allPositions = data
             .map(t => typeof t.position === "number" ? t.position : null)
             .filter((p): p is number => p !== null)
-          
+
           // Use the minimum existing position, or 0 if no positions exist
           const basePosition = allPositions.length > 0 ? Math.min(...allPositions) : 0
 
@@ -446,16 +445,16 @@ export function TasksTable({
           const updatePromises = newOrder.map((id, index) => {
             const task = taskMap.get(id)
             if (!task) return Promise.resolve()
-            
+
             // Calculate the new position based on the new index
             const newPosition = basePosition + index
-            
+
             // Always update to ensure consistency (handles null positions)
             return onUpdateTask(task.id, { position: newPosition })
           })
 
           await Promise.all(updatePromises)
-          
+
           toast.success("Task order updated", {
             description: "Task positions have been saved.",
             duration: 2000,
@@ -629,9 +628,9 @@ export function TasksTable({
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </TableHead>
                       )
                     })}

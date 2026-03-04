@@ -12,18 +12,16 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-import { type Task } from "@/components/tasks-table"
+
 
 export function NavMain({
   items,
-  onTaskCreate,
 }: {
   items: {
     title: string
     url: string
     icon?: Icon
   }[]
-  onTaskCreate?: (task: Omit<Task, "id">) => Promise<void>
 }) {
   const pathname = usePathname()
   const dashboardItem = items.length > 0 ? items[0] : null
@@ -36,7 +34,7 @@ export function NavMain({
           {/* Dashboard - First item */}
           {dashboardItem && (
             <SidebarMenuItem key={dashboardItem.title}>
-              <SidebarMenuButton 
+              <SidebarMenuButton
                 asChild
                 tooltip={dashboardItem.title}
                 isActive={pathname === dashboardItem.url}
@@ -66,18 +64,18 @@ export function NavMain({
             const IconComponent = item.icon
             const isActive = pathname === item.url || (item.url === "/lists" && pathname?.startsWith("/lists"))
             return (
-            <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton 
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
                   asChild
                   tooltip={item.title}
                   isActive={isActive}
                 >
                   <Link href={item.url}>
                     {IconComponent && <IconComponent />}
-                <span>{item.title}</span>
+                    <span>{item.title}</span>
                   </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             )
           })}
         </SidebarMenu>

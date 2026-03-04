@@ -61,14 +61,27 @@ export function useTasks() {
       setTasks(transformedTasks)
       setError(null)
     } catch (err) {
-      const errorMessage = err instanceof Error
+      console.error("Error fetching tasks:", err)
+
+      const isFetchError = err instanceof Error &&
+        (err.message.includes("fetch") || err.message.includes("Failed to fetch") || err.message.includes("network"));
+
+      const isConnectionTimeout = err instanceof Error &&
+        (err.message.includes("timeout") || err.message.includes("aborted"));
+
+      let errorMessage = err instanceof Error
         ? err.message
         : typeof err === 'object' && err !== null && 'message' in err
-          ? String(err.message)
-          : "Failed to fetch tasks. Please ensure the tasks table exists in your Supabase database."
+          ? String((err as any).message)
+          : "An unexpected error occurred."
+
+      if (isFetchError || isConnectionTimeout) {
+        errorMessage = "Network error connecting to Supabase. This often happens if your internet is down or if your Supabase project is currently PAUSED. Please check your Supabase dashboard at https://supabase.com/dashboard and resume the project if needed."
+      } else if (!errorMessage) {
+        errorMessage = "Failed to fetch tasks. Please ensure the tasks table exists in your Supabase database."
+      }
 
       setError(new Error(errorMessage))
-      console.error("Error fetching tasks:", err)
     } finally {
       setLoading(false)
     }
@@ -163,12 +176,12 @@ export function useTasks() {
           schema: "public",
           table: "tasks",
         },
-        (payload) => {
+        (payload: any) => {
           console.log("Real-time update received:", payload)
           fetchTasks()
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         console.log("Subscription status:", status)
       })
 
@@ -347,6 +360,8 @@ export function useTasks() {
     }
   }
 
+  const isLocalMode = typeof window !== 'undefined' && window.localStorage.getItem('supabase_fallback_active') === 'true'
+
   return {
     tasks,
     loading,
@@ -355,5 +370,6 @@ export function useTasks() {
     updateTask,
     deleteTask,
     deleteAllTasks,
+    isLocalMode,
   }
 }

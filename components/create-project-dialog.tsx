@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { format } from "date-fns"
-import { IconFolder, IconLink, IconCalendar } from "@tabler/icons-react"
+import { IconLink, IconCalendar } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -39,7 +39,7 @@ export function CreateProjectDialog({ children, onProjectCreate, open: controlle
   const [internalOpen, setInternalOpen] = React.useState(false)
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const setOpen = onOpenChange || setInternalOpen
-  
+
   const [name, setName] = React.useState("")
   const [description, setDescription] = React.useState("")
   const [projectLink, setProjectLink] = React.useState("")
@@ -49,7 +49,7 @@ export function CreateProjectDialog({ children, onProjectCreate, open: controlle
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!name.trim()) {
       return
     }
@@ -80,12 +80,12 @@ export function CreateProjectDialog({ children, onProjectCreate, open: controlle
           team_assigned: teamAssignedValue,
         })
       }
-      
+
       toast.success("Project created successfully", {
         description: `"${name.trim()}" has been created.`,
         duration: 3000,
       })
-      
+
       // Reset form
       setName("")
       setDescription("")

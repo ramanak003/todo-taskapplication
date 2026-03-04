@@ -30,8 +30,7 @@ export function useProjects() {
         .order("created_at", { ascending: false })
 
       if (error) {
-        console.error("Supabase error:", error)
-        throw new Error(error.message || "Failed to fetch projects")
+        console.error("Supabase detailed error (projects):", JSON.stringify(error, null, 2))
       }
 
       const transformedProjects: Project[] = (data || []).map((project: any) => ({
@@ -50,12 +49,23 @@ export function useProjects() {
       setProjects(transformedProjects)
       setError(null)
     } catch (err) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : "Failed to fetch projects"
-      
-      setError(new Error(errorMessage))
       console.error("Error fetching projects:", err)
+
+      const isFetchError = err instanceof Error &&
+        (err.message.includes("fetch") || err.message.includes("Failed to fetch") || err.message.includes("network"));
+
+      const isConnectionTimeout = err instanceof Error &&
+        (err.message.includes("timeout") || err.message.includes("aborted"));
+
+      let errorMessage = err instanceof Error
+        ? err.message
+        : "Failed to fetch projects"
+
+      if (isFetchError || isConnectionTimeout) {
+        errorMessage = "Network error connecting to Supabase. This often happens if your internet is down or if your Supabase project is currently PAUSED. Please check your Supabase dashboard at https://supabase.com/dashboard and resume the project if needed."
+      }
+
+      setError(new Error(errorMessage))
     } finally {
       setLoading(false)
     }
@@ -74,12 +84,12 @@ export function useProjects() {
           schema: "public",
           table: "projects",
         },
-        (payload) => {
+        (payload: any) => {
           console.log("Real-time project update:", payload)
           fetchProjects()
         }
       )
-      .subscribe((status) => {
+      .subscribe((status: string) => {
         console.log("Projects subscription status:", status)
       })
 
@@ -91,15 +101,15 @@ export function useProjects() {
   const addProject = async (project: Omit<Project, "id" | "created_at" | "updated_at">) => {
     try {
       console.log("Adding project:", project)
-      
+
       // Only include fields that exist (handle missing columns gracefully)
-      const projectData: any = {
+      const projectData: Partial<Project> = {
         name: project.name,
         description: project.description,
         color: project.color,
         icon: project.icon,
       }
-      
+
       // Only add optional fields if they have values
       if (project.project_link) {
         projectData.project_link = project.project_link
@@ -110,7 +120,7 @@ export function useProjects() {
       if (project.team_assigned) {
         projectData.team_assigned = project.team_assigned
       }
-      
+
       const { data, error } = await supabase
         .from("projects")
         .insert([projectData])
@@ -119,19 +129,19 @@ export function useProjects() {
 
       if (error) {
         console.error("Supabase insert error:", error)
-        
+
         // Check if it's a column missing error
         if (error.message?.includes("column") && error.message?.includes("does not exist")) {
           throw new Error(
             "Database columns missing. Please run the SQL migration from 'add-project-fields.sql' in your Supabase dashboard."
           )
         }
-        
+
         throw new Error(error.message || "Failed to add project")
       }
-      
+
       console.log("Project added successfully:", data)
-      
+
       // Optimistically update local state
       if (data) {
         const newProject: Project = {
@@ -148,7 +158,7 @@ export function useProjects() {
         }
         setProjects(prev => [newProject, ...prev])
       }
-      
+
       return data
     } catch (err) {
       console.error("Error adding project:", err)
@@ -159,12 +169,12 @@ export function useProjects() {
   const updateProject = async (id: string, updates: Partial<Project>) => {
     try {
       console.log("Updating project:", id, updates)
-      
+
       // Optimistically update local state
-      setProjects(prev => prev.map(project => 
+      setProjects(prev => prev.map(project =>
         project.id === id ? { ...project, ...updates } : project
       ))
-      
+
       const { data, error } = await supabase
         .from("projects")
         .update(updates)
@@ -178,7 +188,7 @@ export function useProjects() {
         await fetchProjects()
         throw new Error(error.message || "Failed to update project")
       }
-      
+
       console.log("Project updated successfully:", data)
       return data
     } catch (err) {
@@ -190,10 +200,10 @@ export function useProjects() {
   const deleteProject = async (id: string) => {
     try {
       console.log("Attempting to delete project:", id)
-      
+
       // Optimistically update local state
       setProjects(prev => prev.filter(project => project.id !== id))
-      
+
       const { error } = await supabase
         .from("projects")
         .delete()
@@ -205,13 +215,15 @@ export function useProjects() {
         await fetchProjects()
         throw new Error(error.message || "Failed to delete project")
       }
-      
+
       console.log("Project deleted successfully")
     } catch (err) {
       console.error("Error deleting project:", err)
       throw err
     }
   }
+
+  const isLocalMode = typeof window !== 'undefined' && window.localStorage.getItem('supabase_fallback_active') === 'true'
 
   return {
     projects,
@@ -221,5 +233,6 @@ export function useProjects() {
     updateProject,
     deleteProject,
     refetch: fetchProjects,
+    isLocalMode,
   }
 }

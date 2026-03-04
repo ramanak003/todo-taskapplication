@@ -22,7 +22,7 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" onTaskCreate={addTask} />
+      <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
@@ -32,7 +32,7 @@ export default function Page() {
                 <div className="mb-4">
                   <h2 className="text-2xl font-semibold tracking-tight">Welcome back!</h2>
                   <p className="text-muted-foreground">
-                    Here's a list of your tasks for this month.
+                    Here&apos;s a list of your tasks for this month.
                   </p>
                 </div>
                 {error && (
@@ -54,8 +54,8 @@ export default function Page() {
                     </div>
                   </div>
                 ) : (
-                  <TasksTable 
-                    data={tasks} 
+                  <TasksTable
+                    data={tasks}
                     onAddTask={addTask}
                     onUpdateTask={updateTask}
                     onDeleteTask={deleteTask}

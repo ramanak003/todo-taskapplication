@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { format, parseISO } from "date-fns"
-import { IconFolder, IconLink, IconCalendar } from "@tabler/icons-react"
+import { IconLink, IconCalendar } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -40,7 +40,7 @@ export function EditProjectDialog({ project, onProjectUpdate, children, open: co
   const [internalOpen, setInternalOpen] = React.useState(false)
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen
   const setOpen = onOpenChange || setInternalOpen
-  
+
   const [name, setName] = React.useState(project.name)
   const [description, setDescription] = React.useState(project.description || "")
   const [projectLink, setProjectLink] = React.useState(project.project_link || "")
@@ -61,7 +61,7 @@ export function EditProjectDialog({ project, onProjectUpdate, children, open: co
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!name.trim()) {
       return
     }
@@ -75,12 +75,12 @@ export function EditProjectDialog({ project, onProjectUpdate, children, open: co
         due_date: dueDate ? format(dueDate, "yyyy-MM-dd") : undefined,
         team_assigned: teamAssigned.trim() || undefined,
       })
-      
+
       toast.success("Project updated successfully", {
         description: `"${name.trim()}" has been updated.`,
         duration: 3000,
       })
-      
+
       setOpen(false)
     } catch (error) {
       console.error("Error updating project:", error)

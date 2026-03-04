@@ -9,15 +9,13 @@ import {
 } from "@/components/ui/sidebar"
 import { useTasks } from "@/hooks/use-tasks"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { IconAlertCircle, IconAlertTriangle } from "@tabler/icons-react"
+import { IconAlertCircle } from "@tabler/icons-react"
 
 export default function Page() {
   const { tasks, loading, error, addTask, updateTask, deleteTask } = useTasks()
 
   // Filter high and medium priority tasks
-  const importantTasks = tasks.filter((task) => 
+  const importantTasks = tasks.filter((task) =>
     task.priority === "high" || task.priority === "medium"
   ).sort((a, b) => {
     // Sort by priority (high first), then by status
@@ -36,7 +34,7 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" onTaskCreate={addTask} />
+      <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
@@ -74,8 +72,8 @@ export default function Page() {
                     </div>
                   </div>
                 ) : (
-                  <TasksTable 
-                    data={importantTasks} 
+                  <TasksTable
+                    data={importantTasks}
                     onAddTask={addTask}
                     onUpdateTask={updateTask}
                     onDeleteTask={deleteTask}

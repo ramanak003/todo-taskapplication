@@ -33,8 +33,8 @@ type TaskAuditLog = {
   id: string
   task_id: string
   action: "created" | "updated" | "status_changed" | "deleted"
-  previous_values: Record<string, any> | null
-  new_values: Record<string, any> | null
+  previous_values: Record<string, unknown> | null
+  new_values: Record<string, unknown> | null
   actor_name: string | null
   actor_email: string | null
   created_at: string
@@ -48,12 +48,12 @@ interface TaskOverviewSheetProps {
   onDeleteTask?: (id: string) => Promise<void>
 }
 
-export function TaskOverviewSheet({ 
-  task, 
-  open, 
+export function TaskOverviewSheet({
+  task,
+  open,
   onOpenChange,
   onUpdateTask,
-  onDeleteTask 
+  onDeleteTask
 }: TaskOverviewSheetProps) {
   const [isUpdating, setIsUpdating] = React.useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
@@ -88,7 +88,7 @@ export function TaskOverviewSheet({
 
         if (!isMounted) return
         setAuditError(null)
-        setAuditLogs((data as TaskAuditLog[]) || [])
+        setAuditLogs((data as unknown as TaskAuditLog[]) || [])
       } catch (err) {
         console.error("Failed to load task audit logs:", err)
         if (!isMounted) return
@@ -114,7 +114,7 @@ export function TaskOverviewSheet({
 
   const handleMarkComplete = async () => {
     if (!onUpdateTask) return
-    
+
     setIsUpdating(true)
     try {
       const newStatus = task.status === "done" ? "todo" : "done"
@@ -130,11 +130,11 @@ export function TaskOverviewSheet({
 
   const handleDelete = async () => {
     if (!onDeleteTask) return
-    
+
     if (!confirm("Are you sure you want to delete this task?")) {
       return
     }
-    
+
     setIsUpdating(true)
     try {
       await onDeleteTask(task.id)
@@ -169,10 +169,10 @@ export function TaskOverviewSheet({
                 <IconX className="h-5 w-5" />
               </Button>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-2">
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className={cn(
                   "capitalize font-medium",
                   task.status === "done" && "bg-green-50 text-green-700 border-green-300 dark:bg-green-950 dark:text-green-300 dark:border-green-700",
@@ -184,8 +184,8 @@ export function TaskOverviewSheet({
               >
                 {task.status}
               </Badge>
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className={cn(
                   "font-medium",
                   task.priority === "high" && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
@@ -252,7 +252,7 @@ export function TaskOverviewSheet({
                   </div>
                   <span>Timeline</span>
                 </div>
-                
+
                 <div className="pl-9 space-y-3">
                   {task.date && (
                     <div className="flex items-start gap-3">

@@ -365,7 +365,11 @@ export function DataTable({
     [data]
   )
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - react-hooks/incompatible-library
+    compilerOptimize: false,
     data,
     columns,
     state: {
@@ -497,9 +501,9 @@ export function DataTable({
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </TableHead>
                       )
                     })}

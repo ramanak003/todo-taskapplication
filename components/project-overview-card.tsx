@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { IconFolder, IconUsers, IconLink, IconCalendar } from "@tabler/icons-react"
 import { format, parseISO } from "date-fns"
 import { type Project } from "@/hooks/use-projects"

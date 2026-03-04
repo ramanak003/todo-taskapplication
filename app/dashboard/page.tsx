@@ -7,14 +7,16 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import { useTasks } from "@/hooks/use-tasks"
+import { useProjects } from "@/hooks/use-projects"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { 
-  IconCheck, 
-  IconClock, 
-  IconListCheck, 
-  IconTrendingUp,
+import {
+  IconCheck,
+  IconClock,
+  IconListCheck,
   IconAlertCircle,
   IconCircleDot
 } from "@tabler/icons-react"
@@ -22,8 +24,12 @@ import { format } from "date-fns"
 import Link from "next/link"
 
 export default function Page() {
-  const { tasks, loading, error } = useTasks()
+  const { tasks, loading: tasksLoading, error: tasksError, isLocalMode: tasksLocal } = useTasks()
+  const { projects, loading: projectsLoading, error: projectsError, isLocalMode: projectsLocal } = useProjects()
 
+  const loading = tasksLoading || projectsLoading
+  const error = tasksError || projectsError
+  const isLocalMode = tasksLocal || projectsLocal
   // Calculate statistics
   const totalTasks = tasks.length
   const completedTasks = tasks.filter(t => t.status === "done").length
@@ -108,9 +114,47 @@ export default function Page() {
 
                 {error && (
                   <div className="mb-4 p-4 rounded-lg border border-destructive/50 bg-destructive/10 text-destructive">
-                    <p className="font-medium">Error loading dashboard</p>
-                    <p className="text-sm mt-1">{error.message}</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Error loading dashboard</p>
+                        <p className="text-sm mt-1">{error.message}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0 ml-4 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        onClick={() => {
+                          import("@/lib/supabase").then(m => m.useLocalFallback())
+                        }}
+                      >
+                        Try Local Mode
+                      </Button>
+                    </div>
                   </div>
+                )}
+
+                {isLocalMode && (
+                  <Alert className="mb-6 bg-blue-500/10 border-blue-500/50 text-blue-700 dark:text-blue-400">
+                    <IconCircleDot className="h-4 w-4" />
+                    <div className="flex items-center justify-between w-full ml-2">
+                      <div>
+                        <AlertTitle>Local Mode Active</AlertTitle>
+                        <AlertDescription>
+                          You are currently using local storage. Data is saved in your browser and will not sync with other devices.
+                        </AlertDescription>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-blue-500 text-blue-700 dark:text-blue-400 hover:bg-blue-500 hover:text-white"
+                        onClick={() => {
+                          import("@/lib/supabase").then(m => m.useRealSupabase())
+                        }}
+                      >
+                        Return to Online Mode
+                      </Button>
+                    </div>
+                  </Alert>
                 )}
 
                 {loading ? (
@@ -248,18 +292,18 @@ export default function Page() {
                     {/* Recent Tasks */}
                     <Card>
                       <CardHeader>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <CardTitle>Recent Tasks</CardTitle>
-                                <CardDescription>Latest tasks you've created</CardDescription>
-                              </div>
-                              <Link 
-                                href="/lists" 
-                                className="text-sm text-primary hover:underline"
-                              >
-                                View all
-                              </Link>
-                            </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle>Recent Tasks</CardTitle>
+                            <CardDescription>Latest tasks you&apos;ve created</CardDescription>
+                          </div>
+                          <Link
+                            href="/lists"
+                            className="text-sm text-primary hover:underline"
+                          >
+                            View all
+                          </Link>
+                        </div>
                       </CardHeader>
                       <CardContent>
                         {recentTasks.length === 0 ? (
@@ -281,13 +325,12 @@ export default function Page() {
                                     <Badge variant="outline" className="capitalize text-xs">
                                       {task.status}
                                     </Badge>
-                                    <Badge 
-                                      variant="outline" 
-                                      className={`capitalize text-xs ${
-                                        task.priority === "high" ? "border-red-500 text-red-600 dark:text-red-400" :
+                                    <Badge
+                                      variant="outline"
+                                      className={`capitalize text-xs ${task.priority === "high" ? "border-red-500 text-red-600 dark:text-red-400" :
                                         task.priority === "medium" ? "border-yellow-500 text-yellow-600 dark:text-yellow-400" :
-                                        "border-blue-500 text-blue-600 dark:text-blue-400"
-                                      }`}
+                                          "border-blue-500 text-blue-600 dark:text-blue-400"
+                                        }`}
                                     >
                                       {task.priority}
                                     </Badge>

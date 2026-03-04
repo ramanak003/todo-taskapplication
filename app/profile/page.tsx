@@ -16,20 +16,19 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  IconUser,
   IconMail,
   IconCalendar,
   IconEdit,
   IconCamera,
-  IconBell,
+  IconListDetails,
+  IconCircleCheck,
+  IconClock,
+  IconFolder,
   IconLock,
   IconCreditCard,
   IconSettings,
-  IconCircleCheck,
-  IconClock,
-  IconListDetails,
-  IconFolder,
   IconUsers,
+  IconBell,
 } from "@tabler/icons-react"
 import { useTasks } from "@/hooks/use-tasks"
 import { useProjects } from "@/hooks/use-projects"
@@ -59,8 +58,8 @@ const user = {
 }
 
 export default function ProfilePage() {
-  const { tasks, loading: tasksLoading } = useTasks()
-  const { projects, loading: projectsLoading } = useProjects()
+  const { tasks } = useTasks()
+  const { projects } = useProjects()
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [isAvatarDialogOpen, setIsAvatarDialogOpen] = React.useState(false)
   const [profileData, setProfileData] = React.useState(user)
@@ -525,7 +524,7 @@ export default function ProfilePage() {
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium">
-                                Completed task "Design new homepage"
+                                Completed task &quot;Design new homepage&quot;
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 2 hours ago
@@ -539,7 +538,7 @@ export default function ProfilePage() {
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-medium">
-                                Created project "Website Redesign"
+                                Created project &quot;Website Redesign&quot;
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
                                 1 day ago
@@ -569,7 +568,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+      </SidebarInset >
+    </SidebarProvider >
   )
 }

@@ -49,16 +49,16 @@ export function SiteHeader() {
   React.useEffect(() => {
     const fetchUser = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser()
-      
+
       if (authUser) {
-        const name = authUser.user_metadata?.full_name || 
-                     authUser.user_metadata?.name || 
-                     authUser.email?.split("@")[0] || 
-                     "User"
+        const name = authUser.user_metadata?.full_name ||
+          authUser.user_metadata?.name ||
+          authUser.email?.split("@")[0] ||
+          "User"
         const email = authUser.email || ""
-        const avatar = authUser.user_metadata?.avatar_url || 
-                       authUser.user_metadata?.picture || 
-                       ""
+        const avatar = authUser.user_metadata?.avatar_url ||
+          authUser.user_metadata?.picture ||
+          ""
 
         setUser({
           name,
@@ -71,16 +71,16 @@ export function SiteHeader() {
     fetchUser()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
       if (session?.user) {
-        const name = session.user.user_metadata?.full_name || 
-                     session.user.user_metadata?.name || 
-                     session.user.email?.split("@")[0] || 
-                     "User"
+        const name = session.user.user_metadata?.full_name ||
+          session.user.user_metadata?.name ||
+          session.user.email?.split("@")[0] ||
+          "User"
         const email = session.user.email || ""
-        const avatar = session.user.user_metadata?.avatar_url || 
-                       session.user.user_metadata?.picture || 
-                       ""
+        const avatar = session.user.user_metadata?.avatar_url ||
+          session.user.user_metadata?.picture ||
+          ""
 
         setUser({
           name,
@@ -112,7 +112,7 @@ export function SiteHeader() {
     setIsLoggingOut(true)
     try {
       const { error } = await supabase.auth.signOut()
-      
+
       if (error) {
         toast.error("Logout failed", {
           description: error.message,
@@ -124,7 +124,7 @@ export function SiteHeader() {
       toast.success("Logged out successfully", {
         description: "You have been signed out.",
       })
-      
+
       // Redirect to sign-in page
       router.push("/sign-in")
     } catch (err) {
@@ -211,7 +211,7 @@ export function SiteHeader() {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 className="text-destructive focus:text-destructive"

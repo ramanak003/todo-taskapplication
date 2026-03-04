@@ -60,7 +60,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -78,10 +77,8 @@ import {
 import {
   IconUsers,
   IconMail,
-  IconLink,
   IconCopy,
   IconCheck,
-  IconPlus,
   IconUserPlus,
   IconHistory,
   IconEdit,
@@ -89,7 +86,6 @@ import {
   IconMessageCircle,
   IconClock,
   IconDotsVertical,
-  IconChevronDown,
   IconTrash,
 } from "@tabler/icons-react"
 import { ArrowUpDown } from "lucide-react"
@@ -375,7 +371,7 @@ const createTeamMemberColumns = (
   ]
 
 export default function Page() {
-  const [inviteLink, setInviteLink] = React.useState("https://ramana-tasks.vercel.app/join/abc123xyz")
+  const [inviteLink] = React.useState("https://tk.app/invite/team-123")
   const [emailInvite, setEmailInvite] = React.useState("")
   const [copiedLink, setCopiedLink] = React.useState(false)
   const [isInviteDialogOpen, setIsInviteDialogOpen] = React.useState(false)
@@ -385,11 +381,11 @@ export default function Page() {
   const [memberToDelete, setMemberToDelete] = React.useState<TeamMember | null>(null)
 
   // Current user - in a real app, this would come from authentication context
-  const currentUser = {
+  const currentUser = React.useMemo(() => ({
     id: "1", // John Doe is the admin
     email: "john@example.com",
     role: "Admin" as const,
-  }
+  }), [])
 
   // Check if current user is admin
   const isAdmin = currentUser.role === "Admin"
@@ -417,10 +413,10 @@ export default function Page() {
     setIsInviteDialogOpen(false)
   }
 
-  const handleEditMember = (member: TeamMember) => {
+  const handleEditMember = React.useCallback((member: TeamMember) => {
     setEditingMember(member)
     setIsEditDialogOpen(true)
-  }
+  }, [])
 
   const handleSaveMember = () => {
     if (!editingMember) return
@@ -433,7 +429,7 @@ export default function Page() {
     setEditingMember(null)
   }
 
-  const handleDeleteMember = (member: TeamMember) => {
+  const handleDeleteMember = React.useCallback((member: TeamMember) => {
     // Only admins can remove members
     if (!isAdmin) {
       toast.error("Only admins can remove team members")
@@ -447,7 +443,7 @@ export default function Page() {
     }
 
     setMemberToDelete(member)
-  }
+  }, [isAdmin, currentUser.id])
 
   const confirmDeleteMember = () => {
     if (!memberToDelete) return
@@ -463,6 +459,7 @@ export default function Page() {
     [currentUser, handleEditMember, handleDeleteMember]
   )
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: teamMembers,
     columns: teamMemberColumns,
@@ -810,7 +807,7 @@ export default function Page() {
           <DialogHeader>
             <DialogTitle>Edit Team Member</DialogTitle>
             <DialogDescription>
-              Update the member's information and role
+              Update the member&apos;s information and role
             </DialogDescription>
           </DialogHeader>
           {editingMember && (

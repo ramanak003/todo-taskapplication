@@ -31,11 +31,11 @@ export async function POST(request: Request) {
     // Build email payload with proper typing
     const response = await resend.emails.send({
       from,
-      to,
-      subject,
+      to: to as string | string[],
+      subject: subject as string,
       ...(html ? { html } : {}),
       ...(text ? { text } : {}),
-    } as any)
+    } as Parameters<typeof resend.emails.send>[0])
 
     return NextResponse.json(
       {
