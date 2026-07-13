@@ -1,10 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ymnqustfjfyynjyprpkd.supabase.co').trim()
-const rawAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2anlzYXlua3Vrbmhoa3pvdWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MDUzMDEsImV4cCI6MjA4NjE4MTMwMX0.SUWnAZmyJpKIwpgtbRohaVIxgTIHR-u_fJjX1sFEUmQ'
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ymnqustfjfyynjyprpkd.supabase.co').trim();
+// Vercel has a poisoned environment variable for NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY, so we ignore it completely
+// and either use NEXT_PUBLIC_SUPABASE_ANON_KEY or the hardcoded correct sb_publishable key.
+const rawAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_BipApjSTLAd-hXW_Krf2Og_5SqJGKcC';
 
 // Clean the key (remove quotes if they accidentally got in)
-const supabaseAnonKey = rawAnonKey.replace(/['"]/g, '').trim()
+const supabaseAnonKey = rawAnonKey.replace(/['"]/g, '').trim();
 
 // Validation and warnings
 if (process.env.NODE_ENV === "development") {

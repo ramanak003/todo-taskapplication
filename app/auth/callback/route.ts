@@ -7,8 +7,10 @@ export async function GET(request: Request) {
   const next = requestUrl.searchParams.get('next') ?? '/dashboard'
 
   if (code) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+    const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ymnqustfjfyynjyprpkd.supabase.co').trim();
+    // Ignore poisoned NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY variable injected by Vercel
+    const rawAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_BipApjSTLAd-hXW_Krf2Og_5SqJGKcC';
+    const supabaseAnonKey = rawAnonKey.replace(/['"]/g, '').trim();
 
     if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.redirect(
@@ -17,7 +19,7 @@ export async function GET(request: Request) {
     }
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey)
-    
+
     // Exchange the code for a session
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
